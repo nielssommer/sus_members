@@ -1,0 +1,95 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* Header an die Website angelehnt: dunkel, weißer Text */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  background: #111;
+  background: var(--sus-blue);
+  color: var(--sus-white);
+}
+
+.header { background: var(--sus-blue); color: var(--sus-white); }
+.stepsWrap { background: #fff; border: 1px solid #eee; } /* bleibt neutral */
+
+.logo {
+  height: 40px;
+  width: auto;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.brand {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #fff;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 48px;
+  background-image: radial-gradient(
+    ellipse at top,
+    color-mix(in srgb, var(--sus-blue-tint) 30%, transparent),
+    transparent 60%
+  );
+}
+
+.contentWrap {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.title {
+  margin: 8px 0 12px !important;
+}
+
+.stepsWrap {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+}
+
+.card {
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #ececec;
+  background: #fff;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Optional: gleiche „gesperrt“-Optik wie auf der Upload-Seite nutzbar */
+.locked {
+  opacity: 0.7;
+  filter: grayscale(10%);
+  pointer-events: none;
+}
