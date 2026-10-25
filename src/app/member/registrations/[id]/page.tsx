@@ -87,6 +87,21 @@ const normalizeStatusEnum = (v: any): StatusEnum | undefined => {
 const bool = (v?: boolean) => (v ? 'Ja' : 'Nein');
 const val = (v: any) => (v === null || v === undefined || v === '' ? '—' : String(v));
 
+/** Accept ISO dates as well as Mongo extended-JSON dates without rendering "Invalid Date". */
+const formatDate = (value: any, withTime = false) => {
+  if (value === null || value === undefined || value === '') return '—';
+  const unwrapDate = (input: any): any => {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return input;
+    if ('$date' in input) return unwrapDate(input.$date);
+    if ('$numberLong' in input) return input.$numberLong;
+    return input instanceof Date ? input : input.valueOf?.();
+  };
+  const raw = unwrapDate(value);
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) return '—';
+  return withTime ? date.toLocaleString() : date.toLocaleDateString();
+};
+
 const asNumber = (v: any): number | undefined => {
   if (v === null || v === undefined || v === '') return undefined;
   if (typeof v === 'number') return v;
@@ -253,7 +268,7 @@ export default function RegistrationDetail() {
     push('Geburtsort', r.birthCity);
     push('Geschlecht', r.gender);
     push('Mitgliedschaft', r.typeOfMembership);
-    push('Eintritt ab', r.entryDate && new Date(r.entryDate).toLocaleDateString());
+    push('Eintritt ab', formatDate(r.entryDate));
 
     push('Adresse', r.address);
     push('PLZ', r.zip);
@@ -303,21 +318,21 @@ export default function RegistrationDetail() {
     push('Passnummer', e.passNo);
     push('Bisheriger Verein', e.oldTeam);
     push('Fußballverband alt', e.oldAssociation);
-    push('Austritt am', e.exitDate && new Date(e.exitDate).toLocaleDateString());
+    push('Austritt am', formatDate(e.exitDate));
     push('Verbandsstrafe besteht', bool(e.existingPenalty));
     push('Strafe ausstehend', bool(e.activePenalty));
     push('Staatsangehörigkeit', e.stateOfOrigin);
     push('Geburtsort', e.birthCity);
     push('Letzter Wohnort Ausland', e.lastCityInForeignCountry);
     push('Land/Staat', e.lastCountry);
-    push('In DE seit', e.inGermanySince && new Date(e.inGermanySince).toLocaleDateString());
+    push('In DE seit', formatDate(e.inGermanySince));
     push('Vornamen Eltern', e.firstNameOfFatherAndMother);
     push('Richtigkeit bestätigt', bool(e.checkCorrectness));
 
     push('E-Mail (Verifizierung)', r.emailForVerification);
     push('Status', r.status);
-    push('Angelegt', r.createdAt && new Date(r.createdAt).toLocaleString());
-    push('Aktualisiert', r.updatedAt && new Date(r.updatedAt).toLocaleString());
+    push('Angelegt', formatDate(r.createdAt, true));
+    push('Aktualisiert', formatDate(r.updatedAt, true));
 
     await navigator.clipboard.writeText(lines.join('\n'));
     message.success('Alle Daten kopiert.');
@@ -609,7 +624,7 @@ export default function RegistrationDetail() {
                     <Descriptions.Item label="Geburtsort">{val(r.birthCity)}</Descriptions.Item>
                     <Descriptions.Item label="Geschlecht">{formatGender(r.gender)}</Descriptions.Item>
                     <Descriptions.Item label="Mitgliedschaft">{formatMembershipType(r.typeOfMembership)}</Descriptions.Item>
-                    <Descriptions.Item label="Eintritt ab">{r.entryDate && new Date(r.entryDate).toLocaleDateString()}</Descriptions.Item>
+                    <Descriptions.Item label="Eintritt ab">{formatDate(r.entryDate)}</Descriptions.Item>
                   </Descriptions>
 
                   <Descriptions title="Kontakt & Adresse" bordered column={1} size="small">
@@ -685,7 +700,7 @@ export default function RegistrationDetail() {
                     <Descriptions.Item label="Land/Staat">{val(r?.eligibilityToPlay?.lastCountry || r?.eligibility?.lastCountry)}</Descriptions.Item>
                     <Descriptions.Item label="In DE seit">
                       {(r?.eligibilityToPlay?.inGermanySince || r?.eligibility?.inGermanySince) &&
-                        new Date(r?.eligibilityToPlay?.inGermanySince || r?.eligibility?.inGermanySince).toLocaleDateString()}
+                        formatDate(r?.eligibilityToPlay?.inGermanySince || r?.eligibility?.inGermanySince)}
                     </Descriptions.Item>
                     <Descriptions.Item label="Vornamen Eltern">{val(r?.eligibilityToPlay?.firstNameOfFatherAndMother || r?.eligibility?.firstNameOfFatherAndMother)}</Descriptions.Item>
                     <Descriptions.Item label="Richtigkeit bestätigt">{bool(r?.eligibilityToPlay?.checkCorrectness || r?.eligibility?.checkCorrectness)}</Descriptions.Item>
@@ -697,8 +712,8 @@ export default function RegistrationDetail() {
                     </Descriptions.Item>
                     <Descriptions.Item label="E-Mail (Verifizierung)">{val(r.emailForVerification)}</Descriptions.Item>
                     <Descriptions.Item label="Status">{val(r.status)}</Descriptions.Item>
-                    <Descriptions.Item label="Angelegt">{r.createdAt && new Date(r.createdAt).toLocaleString()}</Descriptions.Item>
-                    <Descriptions.Item label="Aktualisiert">{r.updatedAt && new Date(r.updatedAt).toLocaleString()}</Descriptions.Item>
+                    <Descriptions.Item label="Angelegt">{formatDate(r.createdAt, true)}</Descriptions.Item>
+                    <Descriptions.Item label="Aktualisiert">{formatDate(r.updatedAt, true)}</Descriptions.Item>
                     <Descriptions.Item label="Registrierungs-ID">{val(r._id)}</Descriptions.Item>
                   </Descriptions>
                 </div>
